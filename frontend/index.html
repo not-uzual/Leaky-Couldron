@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaky Couldron - Chat App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="app-title">Leaky Couldron</h1>
+        
+        <div class="menu-options">
+            <button class="option-button" data-role="join">
+                <h3>Join</h3>
+            </button>
+            <button class="option-button" data-role="host">
+                <h3>Host</h3>
+            </button>
+        </div>
+
+        <div class="form-container hidden">
+            <form class="chat-form host-form hidden">
+                <label for="host-name">Name:</label>
+                <input type="text" id="host-name" class="form-input" placeholder="Your Good Name" required>
+                <button type="submit" class="form-button">Start Chat</button>
+            </form>
+             
+            <form class="chat-form user-form hidden">
+                <div class="form-step" data-step="name">
+                    <label for="user-name">Name:</label>
+                    <input type="text" id="user-name" class="form-input" required placeholder="Your Good Name">
+                    <button type="button" class="form-button" data-action="next">Next</button>
+                </div>
+                <div class="form-step hidden" data-step="code">
+                    <label for="room-code">Enter Code:</label>
+                    <input type="text" id="room-code" class="form-input" required placeholder="000 000">
+                    <button type="submit" class="form-button">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-chat hidden">
+        <div class="chat-header">
+            <div class="chat-code">
+                <span>Code: <strong id="display-code">000 000</strong></span>
+            </div>
+            <div class="chat-controls">
+                <span class="user-count"><span id="user-count">0</span> Connected</span>
+                <button class="close-chat-btn" aria-label="Close chat">✕</button>
+            </div>
+        </div>
+        
+        <div class="chat-log" id="chat-log">
+            <!-- Messages will appear here -->
+        </div>
+        
+        <div class="chat-input-container">
+            <input type="text" id="message-input" class="message-input" placeholder="Type your message..." />
+            <button class="send-btn" id="send-btn">Send</button>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="apiCall.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
