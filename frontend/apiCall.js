@@ -2,7 +2,7 @@ let socket = null;
 
 function initializeSocket() {
     if (!socket) {
-        socket = io("http://localhost:3000");
+        socket = io("https://leaky-couldron.onrender.com/");
         setupSocketListeners();
     }
     return socket;
