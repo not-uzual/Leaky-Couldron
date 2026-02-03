@@ -6,14 +6,23 @@ const { Server } = require('socket.io');
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+    'https://leaky-couldron.vercel.app',
+    'http://localhost:5500',
+];
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}));
 app.use(express.json());
 
 const server = http.createServer(app);
 const io = new Server(server, {
     cors : {
-        origin: '*',
-        methods: ["GET", "POST"]
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
