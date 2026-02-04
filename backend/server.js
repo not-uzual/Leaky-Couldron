@@ -42,7 +42,7 @@ app.use('/api/payment', razorpayRoutes);
 passport.use(new GoogleStrategy({
     clientID: process.env.GOAUTH_CLIENTID,
     clientSecret: process.env.GOAUTH_SECRET,
-    callbackURL: '/auth/google/callback'
+    callbackURL: `${process.env.backend_url || 'http://localhost:3000'}/auth/google/callback`
   },
   (accessToken, refreshToken, profile, done) => {
     return done(null, profile);
