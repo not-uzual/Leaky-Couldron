@@ -1,8 +1,8 @@
 let socket = null;
 
-const backend_url = 'https://leaky-couldron.onrender.com/'
+const backend_url = 'https://leaky-couldron.onrender.com'
 // 'http://localhost:3000'
-// 'https://leaky-couldron.onrender.com/'
+// 'https://leaky-couldron.onrender.com'
 
 function initializeSocket() {
     if (!socket) {
