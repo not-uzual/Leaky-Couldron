@@ -13,8 +13,51 @@ const closeChatBtn = document.querySelector('.close-chat-btn');
 const displayCode = document.getElementById('display-code');
 const sendBtn = document.getElementById('send-btn')
 const messageInput = document.getElementById('message-input')
+const authSection = document.querySelector('.auth-section');
+const emojiSection = document.querySelector('.emoji-main')
+const emojiSectionArrow = document.querySelector('.arrow')
+const emojiLis = document.querySelector('.emoji-lis');
+let emojiExpanded = false;
 
-// Utility Functions
+emojiSection.addEventListener('click', () => {
+    if (!emojiExpanded) {
+        emojiSection.style.height = '250px';
+        emojiSectionArrow.src = './media/arrow-down.png';
+        emojiLis.classList.remove('hidden')
+        emojiExpanded = true;
+    } else {
+        emojiSection.style.height = '';
+        emojiSectionArrow.src = './media/arrow-up.png';
+        emojiLis.classList.add('hidden')
+        emojiExpanded = false;
+    }
+})
+
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('auth') === 'success') {
+        window.history.replaceState({}, document.title, '/');
+        
+        fetch('https://leaky-couldron.onrender.com/auth/user', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.user) {
+                    window.authenticatedUser = {
+                        name: data.user.displayName,
+                        email: data.user.emails[0].value,
+                        photo: data.user.photos[0].value
+                    };
+                    
+                    authSection.classList.add('hidden');
+                    document.querySelector('.welcome').innerText=`Hello, ${window.authenticatedUser.name}`
+                    document.querySelector('.welcome').classList.remove('hidden')
+                }
+            })
+            .catch(err => console.error('Failed to fetch user:', err)
+        );
+    }
+});
+
 const toggleVisibility = (hideElements, showElements) => {
     hideElements.forEach(el => el.classList.add('hidden'));
     showElements.forEach(el => el.classList.remove('hidden'));
@@ -31,13 +74,20 @@ const enterChat = (userName, roomCode, isHost) => {
     saveToLocalStorage()
 };
 
-// Event Handlers
 const handleOptionClick = (event) => {
     const button = event.target.closest('.option-button');
     if (!button) return;
     
     const role = button.dataset.role;
     const formToShow = role === 'host' ? hostForm : userForm;
+    
+    if (window.authenticatedUser) {
+        if (role === 'host') {
+            document.getElementById('host-name').value = window.authenticatedUser.name;
+        } else {
+            document.getElementById('user-name').value = window.authenticatedUser.name;
+        }
+    }
     
     toggleVisibility([menuOptions], [formContainer, formToShow]);
 };
@@ -51,17 +101,15 @@ const handleNextClick = () => {
     toggleVisibility([nameStep], [codeStep]);
 };
 
-// Event Listeners
 optionButtons.forEach(button => {
     button.addEventListener('click', handleOptionClick);
 });
 
 nextButton.addEventListener('click', handleNextClick);
 
-// Form Submissions
 hostForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const hostName = document.getElementById('host-name').value.trim();
+    const hostName = window.authenticatedUser?.name || document.getElementById('host-name').value.trim();
     if (!hostName) return;
     
     const response = await createChatRoom(hostName);
@@ -72,7 +120,7 @@ hostForm.addEventListener('submit', async (e) => {
 
 userForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const userName = document.getElementById('user-name').value.trim();
+    const userName = window.authenticatedUser?.name || document.getElementById('user-name').value.trim();
     const roomCode = document.getElementById('room-code').value.trim();
     if (!userName || !roomCode) return;
     
@@ -124,3 +172,22 @@ function saveToLocalStorage(){
     localStorage.setItem('chatSession', JSON.stringify(window.currentUser));
     console.log(JSON.parse(localStorage.getItem('chatSession')));
 }
+
+const emojiBoxes = document.querySelectorAll('.emoji-box');
+
+emojiBoxes.forEach((box, index) => {
+    box.addEventListener('click', async (e) => {
+        e.stopPropagation()
+        const priceText = box.querySelector('p').textContent;
+        const amount = parseInt(priceText.replace('₹', '').trim());
+        const emojiImg = box.querySelector('.emoji-icon');
+        const emojiName = emojiImg.alt || `Emoji ${index + 1}`;
+        
+        if (!window.currentUser) {
+            alert('Please join a chat room first!');
+            return;
+        }
+        
+        await handlePayment(amount, emojiName);
+    });
+});
